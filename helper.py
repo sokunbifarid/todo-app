@@ -1,4 +1,5 @@
 import sqlite3
+import string
 
 database_path = "todo_database.db"
 
@@ -26,4 +27,10 @@ def comit_database():
     else:
         print("database connection not established")
 
+def check_if_contains_string(value):
+    all_text = string.ascii_letters
+    for i in value:
+        if i in all_text:
+            return True
+    return False
 
