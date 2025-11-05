@@ -44,8 +44,8 @@ def modify(id):
         render_template("apology.html")
     return 0
 
-@app.route("/delete", methods=["DELETE"])
-def delete():
+@app.route("/delete/<id>", methods=["DELETE"])
+def delete(id):
     global username
     todo_name = request.form.get("todo_name")
     category = request.form.get("category")
@@ -56,7 +56,7 @@ def delete():
         return render_template("apology.html")
     cursor = open_database()
     try:
-        cursor.execute("INSERT INTO todo_data (username, todo_name, category, description) VALUES(?,?,?,?)", (username, todo_name, category, description))
+        cursor.execute("DELTE FROM todo_data WHERE id=? AND username=?", [id, username])
         comit_database()
         close_database()
         return redirect("/")

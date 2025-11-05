@@ -57,7 +57,7 @@ function confirmModify(){
 }
 
 function confirmDelete(){
-	window.location.href="/delete/" + str(focused_todo_id);
+	window.location.href="/delete/" + focused_todo_id.toString();
 	focused_todo_id = 0
 	console.log("function confirm delete called");
 }
