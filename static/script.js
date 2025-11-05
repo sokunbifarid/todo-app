@@ -1,5 +1,19 @@
-const datas = {{ data | tojson }};
-console.log(datas)
+
+//document.addEventListener("DOMContentLoaded", function()
+//	{
+//		const datas = {{ data | tojson | safe}};
+//		console.log(datas)
+//	}
+
+let todo_data = [];
+let focused_todo_id = 0;
+
+fetch("/get_todo_list")
+	.then(response => response.json())
+	.then(data => {
+		todo_data = data;
+		console.log(todo_data);
+	});
 
 function openAddTodoPopup(){
 	closeAllTodoPopup();
@@ -12,7 +26,8 @@ function closeAddTodoPopup(){
 	console.log("closed add todo popup");
 }
 
-function openModifyTodoPopup(){
+function openModifyTodoPopup(id){
+	focused_todo_id = id
 	closeAllTodoPopup();
 	document.getElementById("modify_todo").className = "visible";
 	console.log("open modify popup");
@@ -23,7 +38,8 @@ function closeModifyTodoPopup(){
 	console.log("close modify popup");
 }
 
-function openDeleteTodoPopup(){
+function openDeleteTodoPopup(id){
+	focused_todo_id = id
 	closeAllTodoPopup();
 	document.getElementById("delete_todo").className = "visible";
 	console.log("open delete popup");
@@ -34,9 +50,16 @@ function closeDeleteTodoPopup(){
 	console.log("close delete popup");
 }
 
-function confirmDelete(id){
-	window.location.href="/index";
-	console.log("function called");
+function confirmModify(){
+	window.location.href="/modify/" + str(focused_todo_id);
+	focused_todo_id = 0
+	console.log("function confirm modify called");
+}
+
+function confirmDelete(){
+	window.location.href="/delete/" + str(focused_todo_id);
+	focused_todo_id = 0
+	console.log("function confirm delete called");
 }
 
 function closeAllTodoPopup(){
