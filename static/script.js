@@ -1,10 +1,3 @@
-
-//document.addEventListener("DOMContentLoaded", function()
-//	{
-//		const datas = {{ data | tojson | safe}};
-//		console.log(datas)
-//	}
-
 let todo_data = [];
 let focused_todo_id = 0;
 
@@ -42,7 +35,20 @@ function openDeleteTodoPopup(id){
 	focused_todo_id = id
 	closeAllTodoPopup();
 	document.getElementById("delete_todo").className = "visible";
+	populate_delete_todo_popup();
 	console.log("open delete popup");
+}
+
+function populate_delete_todo_popup(){
+	let s_n = todo_data.at(focused_todo_id);
+	console.log(s_n);
+	let todo_name = todo_data.at(focused_todo_id)//.at(2);
+	let category = todo_data.at(focused_todo_id)//at(3);
+	let description = todo_data.at(focused_todo_id)//.at(4);
+	document.getElementById("delete_todo_id").innerHTML = s_n;
+	document.getElementById("delete_todo_name").innerHTML = todo_name;
+	document.getElementById("delete_todo_category").innerHTML = category;
+	document.getElementById("delete_todo_description").innerHTML = description;
 }
 
 function closeDeleteTodoPopup(){
@@ -51,14 +57,20 @@ function closeDeleteTodoPopup(){
 }
 
 function confirmModify(){
-	window.location.href="/modify/" + str(focused_todo_id);
-	focused_todo_id = 0
+	fetch("/modify/" + focused_todo_id.toString(), {method:"PUT"})
+		.then(response =>{
+			window.location.href="/";
+		});
+	focused_todo_id = 0;
 	console.log("function confirm modify called");
 }
 
 function confirmDelete(){
-	window.location.href="/delete/" + focused_todo_id.toString();
-	focused_todo_id = 0
+	fetch("/delete/" + focused_todo_id.toString(), {method:"DELETE"})
+		.then(response =>{
+			window.location.href="/";
+		});
+	focused_todo_id = 0;
 	console.log("function confirm delete called");
 }
 
