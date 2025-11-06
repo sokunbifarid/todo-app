@@ -9,7 +9,6 @@ CATEGORIES = ["Normal", "Important", "Urgent"]
 
 @app.route("/", methods=["GET"])
 def index():
-    print("indexed")
     data = get_todo_list()
     return render_template("index.html", categories=CATEGORIES, data=data)
 
@@ -25,12 +24,9 @@ def get_todo_list():
         pass
     return data
 
-@app.route("/modify/<id>", methods=["PUT"])
-def modify(id):
+@app.route("/modify/<id>/<todo_name>/<category>/<description>", methods=["PUT"])
+def modify(id, todo_name, category, description):
     global username
-    todo_name = request.form.get("todo_name")
-    category = request.form.get("category")
-    description = request.form.get("description")
     if not todo_name or not category or not description:
         return render_template("apology.html")
     if not check_if_contains_string(todo_name) or not check_if_contains_string(description):
@@ -40,9 +36,9 @@ def modify(id):
         cursor.execute("UPDATE todo_data SET todo_name=?, category=?, description=? WHERE username=? AND id=?",[todo_name, category, description, username, id])
         comit_database()
         close_database()
-        return redirect("/")
+        return ("sucess", 200)
     except ValueError as e:
-        render_template("apology.html")
+        return render_template("apology.html")
 
 @app.route("/delete/<id>", methods=["GET", "DELETE"])
 def delete(id):
@@ -53,11 +49,9 @@ def delete(id):
         cursor.execute("DELETE FROM todo_data WHERE id=? AND username=?", [id, username])
         comit_database()
         close_database()
-        print("pass")
-        return redirect(url_for("index"))
-        print("passat")
+        return ("sucess", 200)
     except ValueError as e:
-        render_template("apology.html")
+        return render_template("apology.html")
 
 @app.route("/write", methods=["POST"])
 def write():
@@ -74,6 +68,6 @@ def write():
         cursor.execute("INSERT INTO todo_data (username, todo_name, category, description) VALUES(?,?,?,?)", (username, todo_name, category, description))
         comit_database()
         close_database()
-        return redirect("/")
+        return render_template("/")
     except ValueError as e:
-        render_template("apology.html")
+        return render_template("apology.html")
