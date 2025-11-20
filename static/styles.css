@@ -1,3 +1,22 @@
+:root{
+	--primary_color: #4A90E2;
+	--secondary_color: #50E3C2;
+	--accent_color: #9013FE;
+	--background_color: #F5F7FA;
+	--text_primary_color: #2C3E50;
+	--white: #FFFFFF;
+}
+
+.white_button{
+	color: var(--white);
+}
+.main_background{
+	background_color: var(--background-color);
+}
+.tasks_background{
+	color: var(--text_primary_color);
+}
+
 .hidden{
 	display: none;
 }

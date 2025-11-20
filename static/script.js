@@ -110,3 +110,9 @@ function closeAllTodoPopup(){
 	closeModifyTodoPopup();
 	closeDeleteTodoPopup();
 }
+
+function logOut(){
+	fetch("/logout").then(response =>{
+		window.location.href="/";
+	});
+}

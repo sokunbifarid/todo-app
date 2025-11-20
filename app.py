@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
 from helper import open_database, close_database, comit_database, check_if_contains_string
-from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -12,7 +12,6 @@ login_manager = LoginManager()
 login_manager.login_view = "login"
 login_manager.init_app(app)
 
-username = "DEFAULT"
 CATEGORIES = ["Normal", "Important", "Urgent"]
 
 @app.route("/", methods=["GET"])
@@ -24,11 +23,11 @@ def index():
 @app.route("/get_todo_list", methods=["GET"])
 @login_required
 def get_todo_list():
-    global username
+    email = current_user.get_email()
     data = [0,0,0]
     try:
         cursor = open_database()
-        data = cursor.execute("SELECT * FROM todo_data WHERE username=?", [username]).fetchall()
+        data = cursor.execute("SELECT * FROM todo_data WHERE email=?", [email]).fetchall()
         close_database()
     except ValueError as e:
         pass
@@ -37,14 +36,14 @@ def get_todo_list():
 @app.route("/modify/<id>/<todo_name>/<category>/<description>", methods=["PUT"])
 @login_required
 def modify(id, todo_name, category, description):
-    global username
+    email = current_user.get_email()
     if not todo_name or not category or not description:
         return render_template("apology.html")
     if not check_if_contains_string(todo_name) or not check_if_contains_string(description):
         return render_template("apology.html")
     cursor = open_database()
     try:
-        cursor.execute("UPDATE todo_data SET todo_name=?, category=?, description=? WHERE username=? AND id=?",[todo_name, category, description, username, id])
+        cursor.execute("UPDATE todo_data SET todo_name=?, category=?, description=? WHERE email=? AND id=?",[todo_name, category, description, email, id])
         comit_database()
         close_database()
         return ("sucess", 200)
@@ -55,10 +54,10 @@ def modify(id, todo_name, category, description):
 @login_required
 def delete(id):
     print("delete function called")
-    global username
+    email = current_user.get_email()
     cursor = open_database()
     try:
-        cursor.execute("DELETE FROM todo_data WHERE id=? AND username=?", [id, username])
+        cursor.execute("DELETE FROM todo_data WHERE id=? AND email=?", [id, email])
         comit_database()
         close_database()
         return ("sucess", 200)
@@ -68,7 +67,7 @@ def delete(id):
 @app.route("/write", methods=["POST"])
 @login_required
 def write():
-    global username
+    email = current_user.get_email()
     todo_name = request.form.get("todo_name")
     category = request.form.get("category")
     description = request.form.get("description")
@@ -78,7 +77,7 @@ def write():
         return render_template("apology.html")
     cursor = open_database()
     try:
-        cursor.execute("INSERT INTO todo_data (username, todo_name, category, description) VALUES(?,?,?,?)", (username, todo_name, category, description))
+        cursor.execute("INSERT INTO todo_data (email, todo_name, category, description) VALUES(?,?,?,?)", (email, todo_name, category, description))
         comit_database()
         close_database()
         return redirect(url_for("index"))
@@ -86,58 +85,82 @@ def write():
         return render_template("apology.html")
 
 class User(UserMixin):
-    def __init__(self, id, username, password):
+    def __init__(self, id, email, password):
         self.id = id
-        self.username = username
+        self.email = email
         self.password = password
+    def is_authenticated(self):
+        if self.id and self.username and self.password:
+            return true
+        return false
+    def is_active(self):
+        return true
+    def is_anonymous(self):
+        return true
+    def get_id(self):
+        return self.id
+    def get_email(self):
+        return self.email
 
 @login_manager.user_loader
 def user_loader(id):
     cursor = open_database()
-    userdata = cursor.execute("SELECT * FROM users WHERE id=?", id).fetchone()
+    userdata = cursor.execute("SELECT * FROM users WHERE id=?", [id]).fetchone()
     close_database()
     if userdata:
         print("userdata: " + str(userdata))
         return User(userdata[0], userdata[1], userdata[2])
-    return None
-
-@login_manager.request_loader
-def request_loader(request):
-   # cursor = open_database()
-   # userdata = cursor.execute("SELECT * FROM users WHERE id=?", id).fetchone()
-   # close_database()
-   # if userdata:
-   #     print("userdata: " + str(userdata))
-   #     return User(userdata[0], userdata[1], userdata[2])
-   # return None
-    pass
+    return None    
 
 @app.route("/login", methods=["GET", "POST"])
-@login_required
 def login():
-    if method == "POST":
+    if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
         cursor = open_database()
-        userdata = cursor.execute("SELECT * FROM users WHERE email=?", email).fetchone()
+        userdata = cursor.execute("SELECT * FROM users WHERE email=?", [email]).fetchone()
         close_database()
         print("userdata login: " + str(userdata))
         if userdata and check_password_hash(userdata[2], password):
             user = User(userdata[0], userdata[1], userdata[2])
             login_user(user)
             return redirect("/")
+        else:
+            print("got here")
+            return render_template("authentication_apology.html", name="Login", condition="Account not found")
     return render_template("login.html")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    if method == "POST":
+    if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
+        confirm_password = request.form.get("confirm-password")
+        print("password: " + str(password))
+        print("confirm_password: " + str(confirm_password))
+        if not password == confirm_password:
+            return render_template("authentication_apology.html", name="Register", condition="Password and Confirm Password don't match")
+        cursor = open_database()
+        try:
+            userdata = cursor.execute("SELECT * FROM users WHERE email=?", [email]).fetchone()
+            print("userdata for register: " + str(userdata))
+            if len(userdata) > 0:
+                return render_template("authentication_apology.html", name="Register", condition="Account exists")
+        except:
+            pass
+        hashed_password =  generate_password_hash(password)
+        try:
+            cursor.execute("INSERT INTO users (email, password) VALUES(?,?)", [email, hashed_password])
+            print("gott here")
+        except ValueError as e:
+            return render_template("apology.html")
+        comit_database()
+        close_database()
+        return redirect(url_for("login"))
+    return render_template("register.html")
 
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
-    return redirect("/login")
-
-
+    return {"success" : 200}#redirect("/login")
