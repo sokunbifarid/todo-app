@@ -7,4 +7,11 @@
 	<p>Error: Check details inputed
 	<br>
 	<strong>Reason: {{condition}}</strong>
+	<br>
+	<br>
+	{% if name=="Login"%}
+		<button onclick="goLogin()" class="button">Retry</button>
+	{% elif name=="Register"%}
+		<button onclick="goRegister()" class="button">Retry</button>
+	{% endif %}
 {%endblock%}

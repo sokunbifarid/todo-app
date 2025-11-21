@@ -6,15 +6,91 @@
 	--text_primary_color: #2C3E50;
 	--white: #FFFFFF;
 }
+body {
+  background-color: var(--background_color);
+  color: var(--text_primary_color);
+  font-family: 'Inter', sans-serif;
+  max-width: 80vw;
+}
 
-.white_button{
-	color: var(--white);
+button {
+  background: var(--primary_color);
+  color: var(--white);
+  border-radius: 8px;
+  padding: 10px 16px;
+  transition: 0.3s;
 }
-.main_background{
-	background_color: var(--background-color);
+
+button:hover {
+  background: var(--secondary_color);
+  transform: scale(1.05);
 }
-.tasks_background{
-	color: var(--text_primary_color);
+
+input[type="text"], input[type="email"], input[type="password"]{
+	width:70%;
+	padding: 1.5%;
+	background-color:rgba(0, 0, 0, 0.089);
+	border-radius: 1%;
+	border: 2px solid black;
+	margin: 2% 0% 2% 0%;
+}
+
+select{
+	width: 50%;
+	padding: 1.5%;
+	border-radius: 2%;
+	border: 2px solid black;
+	margin: 2% 0% 2% 0%;
+}
+
+textarea{
+	width: 100%;
+	padding: 1.5%;
+	border-radius: 1%;
+	border: 2px solid black;
+	margin: 2% 0% 2% 0%;
+	background-color:rgba(0, 0, 0, 0.089);
+}
+
+.task-card {
+  background: var(--white);
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin: 0px;
+  margin-bottom: 12px;
+}
+
+/* .task-card.completed {
+  opacity: 0.6;
+  text-decoration: line-through;
+} */
+
+.popup_cover{
+	background-color: rgba(0, 0, 0, 0.26);
+	width: 100vw;
+	height: 100vh;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.popup{
+	min-height: 270px;
+	height: 55%;
+	width: 40%;
+	max-width: 40%;
+	max-height: 270px;/*40%;*/
+	position: absolute;
+	top: 30%;
+	left: 30%;
+	background-color: var(--white);
+	padding: 3%;
+	border-radius: 3%;
+}
+
+
+.popup h3{
+	text-align: center;
 }
 
 .hidden{

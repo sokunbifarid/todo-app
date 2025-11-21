@@ -6,9 +6,20 @@ set -e
 # Creating a Virtual Environment
 echo "Setting up python environment"
 python -m venv .venv
-source .venv/Scripts/activate
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+    source .venv/Scripts/activate
+else
+    source .venv/bin/activate
+fi
 
-# Installing Dependencies and Starting Flask Application
+# Installing Dependencies
 echo "Installing requirements, if successful Starting Flask Application"
-pip install -r requirements.txt && python flask run
+pip install -r requirements.txt
+
+# Running Python Application
+echo "Starting flask application"
+
+python -m flask run
+
+
 

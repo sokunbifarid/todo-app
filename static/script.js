@@ -15,7 +15,7 @@ function openAddTodoPopup(){
 }
 
 function closeAddTodoPopup(){
-	document.getElementById("add_todo").className = "hidden";
+	document.getElementById("add_todo").className = "hidden popup";
 	console.log("closed add todo popup");
 }
 
@@ -115,4 +115,16 @@ function logOut(){
 	fetch("/logout").then(response =>{
 		window.location.href="/";
 	});
+}
+
+function goHome(){
+	window.location.href="/";
+}
+
+function goLogin(){
+	window.location.href = "/login";
+}
+
+function goRegister(){
+	window.location.href = "/register";
 }
